@@ -15,7 +15,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Member signup(String username, String password, String nickname, String email, String typeCode, String url){
+    public Member signup(String username, String password, String nickname, String email, String url){
         Member member = Member
                 .builder()
                 .username(username)
@@ -29,23 +29,24 @@ public class MemberService {
     }
 
     @Transactional
-    public Member whenSocialLogin(String providerTypeCode, String username, String nickname, String profileImageUrl) {
-        Optional<Member> opMember = findByUsernameAndProviderTypeCode(username, providerTypeCode);
+    public Member whenSocialLogin( String username, String nickname, String profileImageUrl, String email) {
+        Optional<Member> opMember = findByUsername(username);
 
         if (opMember.isPresent()) return opMember.get();
 
         // 소셜 로그인를 통한 가입시 비번은 없다.
-        return signup(username, "", nickname, "", providerTypeCode, profileImageUrl); // 최초 로그인 시 딱 한번 실행
+        return signup(username, "", nickname, email , profileImageUrl); // 최초 로그인 시 딱 한번 실행
     }
 
     @Transactional
-    public Member signupGoogle(String username, String nickname, String email) {
+    public Member signupGoogle(String username, String nickname, String profileImageUrl ,String email) {
         // 구글 로그인으로부터 받은 정보로 Member 객체 생성
         Member member = Member.builder()
                 .username(username)
                 .password("") // 구글 로그인으로부터 받은 정보만으로 회원가입이 이루어지므로 비밀번호는 필요하지 않음
                 .nickname(nickname)
                 .email(email)
+                .profile_url(profileImageUrl)
                 .build();
 
         // 회원 저장
@@ -55,7 +56,5 @@ public class MemberService {
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByusername(username);
     }
-    public Optional<Member> findByUsernameAndProviderTypeCode(String username, String providerTypeCode) {
-        return memberRepository.findByUsernameAndProviderTypeCode(username, providerTypeCode);
-    }
+
 }

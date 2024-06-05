@@ -34,14 +34,20 @@ public class MemberController {
 
     @PostMapping("/signup")
     public String signup(@Valid SignForm signForm) {
-        memberService.signup(signForm.getUsername(), signForm.getPassword(), signForm.getNickname(), signForm.getEmail(), signForm.getTypeCode(), signForm.getProfile_url());
+        memberService.signup(signForm.getUsername(), signForm.getPassword(), signForm.getNickname(), signForm.getEmail(), signForm.getProfile_url());
         return "redirect:/member/login";
     }
 
     @PostMapping("/signup/google")
     public String signupGoogle(@Valid GoogleSignForm signForm) {
-        memberService.signupGoogle(signForm.getUsername(), signForm.getNickname(), signForm.getEmail());
+        memberService.whenSocialLogin(signForm.getUsername(), signForm.getNickname(), signForm.getProfileUrl() ,signForm.getEmail());
         return "redirect:/member/login"; // 회원가입 후 메인 페이지로 이동하도록 수정
+    }
+
+    @PostMapping("/signup/naver")
+    public String signupNaver(@Valid NaverSignForm signForm) {
+        memberService.whenSocialLogin(signForm.getUsername(), signForm.getNickname(),signForm.getProfileUrl() ,signForm.getEmail());
+        return "redirect:/member/login"; // 회원가입 후 로그인 페이지로 이동
     }
 
     @ToString
@@ -84,4 +90,21 @@ public class MemberController {
         private String profileUrl;
     }
 
+    @ToString
+    @Getter
+    @Setter
+    public static class NaverSignForm {
+        @NotBlank
+        private String username;
+
+        @NotBlank
+        private String nickname;
+
+        @NotBlank
+        private String email;
+
+        private String profileUrl;
+    }
+
 }
+
