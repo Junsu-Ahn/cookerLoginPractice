@@ -4,11 +4,15 @@ import com.example.cookers.domain.dto.JoinRequest;
 import com.example.cookers.domain.dto.LoginRequest;
 import com.example.cookers.domain.member.entity.User;
 import com.example.cookers.domain.member.repository.UserRepository;
+import com.example.cookers.domain.recipe.entity.Recipe;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -61,7 +65,7 @@ public class UserService {
      *  화면에서 LoginRequest(loginId, password)을 입력받아 loginId와 password가 일치하면 User return
      *  loginId가 존재하지 않거나 password가 일치하지 않으면 null return
      */
-    public User login(LoginRequest req) {
+    public User login(LoginRequest req, HttpServletRequest request) {
         Optional<User> optionalUser = userRepository.findByLoginId(req.getLoginId());
 
         // loginId와 일치하는 User가 없으면 null return
@@ -71,10 +75,15 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        // 찾아온 User의 password와 입력된 password가 다르면 null return
-        if(!user.getPassword().equals(req.getPassword())) {
-            return null;
+        boolean passwordMatch = encoder.matches(req.getPassword(), user.getPassword());
+        if (!passwordMatch) {
+            return null; // 비밀번호가 일치하지 않으면 null return
         }
+
+        HttpSession session = request.getSession(true);
+
+        // 사용자 정보를 세션에 저장
+        session.setAttribute("user", user);
 
         return user;
     }

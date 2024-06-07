@@ -1,110 +1,51 @@
 package com.example.cookers.domain.member.controller;
 
-import org.springframework.ui.Model;
 
 import com.example.cookers.domain.dto.JoinRequest;
 import com.example.cookers.domain.dto.LoginRequest;
 import com.example.cookers.domain.member.entity.User;
+import com.example.cookers.domain.member.service.MemberService;
 import com.example.cookers.domain.member.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
-
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/security-login")
+@RequestMapping("/member")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping(value = {"", "/"})
-    public String home(Model model, Authentication auth) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        if(auth != null) {
-            User loginUser = userService.getLoginUserByLoginId(auth.getName());
-            if (loginUser != null) {
-                model.addAttribute("nickname", loginUser.getNickname());
-            }
-        }
-
-        return "home";
-    }
-
-    @GetMapping("/join")
-    public String joinPage(Model model) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        model.addAttribute("joinRequest", new JoinRequest());
-        return "join";
-    }
-
-    @PostMapping("/join")
-    public String join(@Valid @ModelAttribute JoinRequest joinRequest, BindingResult bindingResult, Model model) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        // loginId 중복 체크
-        if(userService.checkLoginIdDuplicate(joinRequest.getLoginId())) {
-            bindingResult.addError(new FieldError("joinRequest", "loginId", "로그인 아이디가 중복됩니다."));
-        }
-        // 닉네임 중복 체크
-        if(userService.checkNicknameDuplicate(joinRequest.getNickname())) {
-            bindingResult.addError(new FieldError("joinRequest", "nickname", "닉네임이 중복됩니다."));
-        }
-        // password와 passwordCheck가 같은지 체크
-        if(!joinRequest.getPassword().equals(joinRequest.getPasswordCheck())) {
-            bindingResult.addError(new FieldError("joinRequest", "passwordCheck", "바밀번호가 일치하지 않습니다."));
-        }
-
-        if(bindingResult.hasErrors()) {
-            return "join";
-        }
-
-        userService.join2(joinRequest);
-        return "redirect:/security-login";
-    }
-
+    @PreAuthorize("isAnonymous()")
     @GetMapping("/login")
-    public String loginPage(Model model) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        model.addAttribute("loginRequest", new LoginRequest());
-        return "login";
+    public String loginPage() {
+        return "member/login";
     }
 
-    @GetMapping("/info")
-    public String userInfo(Model model, Authentication auth) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        User loginUser = userService.getLoginUserByLoginId(auth.getName());
-
-        if(loginUser == null) {
-            return "redirect:/security-login/login";
-        }
-
-        model.addAttribute("user", loginUser);
-        return "info";
+    @PostMapping("/login") // 로그인 처리를 위한 POST 매핑 추가
+    public String login(@Valid LoginRequest loginRequest) {
+        // 로그인 처리 로직 구현
+        // userService.login(loginRequest)를 호출하여 로그인 처리하고 성공 시 리다이렉트 등의 작업 수행
+        return "redirect:/"; // 로그인 성공 후 리다이렉트할 경로
+    }
+    @GetMapping("/signup")
+    public String signupPage() {
+        return "member/signup";
     }
 
-    @GetMapping("/admin")
-    public String adminPage( Model model) {
-        model.addAttribute("loginType", "security-login");
-        model.addAttribute("pageName", "Security 로그인");
-
-        return "admin";
+    @PostMapping("/signup")
+    public String signup(@Valid JoinRequest joinRequest) {
+        userService.join2(joinRequest);
+        return "redirect:/member/login";
     }
 }

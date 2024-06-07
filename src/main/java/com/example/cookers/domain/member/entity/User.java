@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -24,7 +23,7 @@ public class User {
     private String nickname;
 
     private UserRole role;
-
+    private int hit;
     // OAuth 로그인에 사용
     private String provider;
     private String providerId;

@@ -23,9 +23,13 @@
                 <a sec:authorize="isAnonymous()" href="/member/login">
                     <img src=/"https:/recipe1.ezmember.co.kr/img/ico_user.png" alt="로그인">
                 </a>
+                <a sec:authorize="isAnonymous()" href="/member/join">
+                    <img src=/"https:/recipe1.ezmember.co.kr/img/ico_user.png" alt="회원가입">
+                </a>
                 <a sec:authorize="isAuthenticated()" href="/member/logout">
                     <img src="http://k.kakaocdn.net/dn/OgRyt/btsGCuMdVmT/U9X1ZKLWtR5KpEab9oh7ek/img_640x640.jpg" alt="로그아웃">
                 </a>
+
             </div>
         </div>
     </div>

@@ -2,6 +2,7 @@ package com.example.cookers.domain.dto;
 
 import com.example.cookers.domain.member.entity.User;
 import com.example.cookers.domain.member.entity.UserRole;
+import com.example.cookers.domain.member.repository.UserRepository;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class JoinRequest {
-
+    // member의 signForm 역할
     @NotBlank(message = "로그인 아이디가 비어있습니다.")
     private String loginId;
 
